@@ -1,52 +1,61 @@
 Main = 
-{
+{	
 	dom:false,
 		
 	init: function()
 	{
-		this.dom = document.getElementById('dragZone');
+		this.dom = document.getElementById('dwgGallery');
+		this.fr = new FileReader();
 	},
-
+	
 	onDragOver: function(ev)
 	{
 		ev.preventDefault();
+		document.getElementById("notification").className = "active";
 	},
 	
 	onDrop: function(ev)
 	{
+		document.getElementById("notification").className = "deactive";
 		ev.preventDefault();
 		
-		var reader = new FileReader();
-			
-		reader.onload = function(e)
-		{
-			var text = e.target.result;
-			var v = parseInt(text);
-			
-			console.log(v);
-			
-			if(v<1015)
-				Main.print('Lt 98/97');
-			else if(v<1018)
-				Main.print('2000');
-			else if(v<1021)
-				Main.print('2004');
-			else if(v<1024)
-				Main.print('2007');
-			else if(v<1027)
-				Main.print('2010');
-			else
-				Main.print('2013 or later');
-		};
+		Main.dom.innerHTML = "";
 		
-		reader.readAsText(ev.dataTransfer.files[0].slice(2,6));
+		for(var i=0; i<ev.dataTransfer.files.length; ++i)
+		{
+			var reader = new FileReader();
+			
+			reader.onload = (function(file){
+				 return function(e)
+				 {
+					var text = e.target.result;
+					var v = parseInt(text);
+					
+					if(v<1015)
+						Main.print('Lt 98/97', file);
+					else if(v<1018)
+						Main.print('2000', file);
+					else if(v<1021)
+						Main.print('2004', file);
+					else if(v<1024)
+						Main.print('2007', file);
+					else if(v<1027)
+						Main.print('2010', file);
+					else
+						Main.print('2013 or later', file);
+				 };
+			})(ev.dataTransfer.files[i]); 
+			
+			reader.readAsText(ev.dataTransfer.files[i].slice(2,6));
+		}
 	},
 	
-	print: function(str)
-	{
-		console.log(str);
-		
-		Main.dom.innerHTML = str;
+	print: function(str, file)
+	{	
+		Main.dom.innerHTML += '<div class="v'+str+'">'
+			+'<b>'+file.name+'</b><br>'
+			+str
+			+'</div>';
 	}
 };//eo Main{}
 
